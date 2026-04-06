@@ -38,6 +38,12 @@ interface Word {
   index: number;
 }
 
+interface StructuredLine {
+  words: Word[];
+  isHeader: boolean;
+  isEmpty: boolean;
+}
+
 // --- PDF Worker Setup ---
 // In a real environment, we'd use a CDN for the worker
 pdfjs.GlobalWorkerOptions.workerSrc = `https://cdnjs.cloudflare.com/ajax/libs/pdf.js/${pdfjs.version}/pdf.worker.min.mjs`;
@@ -45,6 +51,7 @@ pdfjs.GlobalWorkerOptions.workerSrc = `https://cdnjs.cloudflare.com/ajax/libs/pd
 export default function App() {
   const [content, setContent] = useState<string>('');
   const [words, setWords] = useState<Word[]>([]);
+  const [structuredContent, setStructuredContent] = useState<StructuredLine[]>([]);
   const [currentWordIndex, setCurrentWordIndex] = useState<number>(-1);
   const [isPlaying, setIsPlaying] = useState(false);
   const [isPaused, setIsPaused] = useState(false);
@@ -57,6 +64,85 @@ export default function App() {
   const [selectedVoice, setSelectedVoice] = useState<string | null>(null);
   const [fontSize, setFontSize] = useState(18);
   const [isDarkMode, setIsDarkMode] = useState(true);
+
+  const SAMPLE_CONTENT = `Topic Title
+Area & Volume
+
+Overview
+This lesson introduces 6th-grade students to the concepts of area for 2D shapes and volume for 3D figures. Students will explore these concepts through hands-on activities and see how they apply in real-world contexts.
+
+Prerequisites
+Basic multiplication skills
+Understanding of length and width
+
+Understanding Area
+Area refers to the number of square units needed to cover a surface.
+Explanation: The area of a rectangle is calculated by multiplying its length by its width. For example, if a rectangle has a length of 8 cm and a width of 4 cm, its area is 32 cm².
+Examples: 
+- A rectangle with a length of 5 cm and a width of 3 cm has an area of 15 cm².
+- A square with sides of 2 m measures its area as 4 m².
+
+Key Points:
+- Area is always measured in square units.
+- Different shapes will have different formulas for area calculation.
+
+Understanding Volume
+Volume is the measure of space a 3D shape occupies.
+Explanation: To find the volume of a cuboid, multiply its length, width, and height. For example, a cuboid with dimensions 3 cm × 4 cm × 5 cm has a volume of 60 cm³.
+Examples: 
+- A shoebox (cuboid) with dimensions 10 cm × 20 cm × 5 cm has a volume of 1000 cm³.
+- A cube with each side of 3 inches has a volume of 27 in³.
+
+Key Points:
+- Volume is measured in cubic units.
+- More complex shapes require different volume formulas.
+
+Definitions
+Area: The amount of space inside a two-dimensional shape.
+Volume: The amount of space inside a three-dimensional object.
+Rectangle: A four-sided shape with opposite sides that are equal and right angles.
+Cuboid: A three-dimensional shape with six rectangular faces.
+Units: A standard measurement, such as square centimeters (cm²) for area and cubic centimeters (cm³) for volume.
+
+Common Misconceptions
+Misconception: Area and volume are the same.
+Correction: Area measures 2D surfaces, while volume measures 3D spaces.
+Misconception: Volume is always larger than area.
+Correction: Volume and area measure different things and cannot be directly compared.
+
+Practice Questions
+Question: Find the area of a rectangle with a length of 6 cm and a width of 3 cm.
+Answer: 18 cm²
+Hint: Use the formula: Area = length × width.
+Difficulty: medium
+Type: Calculate Area
+
+Question: What is the volume of a box with dimensions 4 cm × 5 cm × 3 cm?
+Answer: 60 cm³
+Hint: Use the formula: Volume = length × width × height.
+Difficulty: medium
+Type: Calculate Volume
+
+Real-World Applications
+- Calculating the amount of paint needed to cover a wall.
+- Determining the volume of a container to hold a specific amount of liquid.
+- Architects using area and volume in building designs.
+
+Resources
+Title: Understanding Area and Volume
+Description: An educational video that visually explains the concepts of area and volume.
+Type: Video
+URL: https://www.example.com/video-understanding-area-volume
+
+Next Steps
+- Explore surface area of 3D shapes
+- Learn about volumes of other geometric shapes like cylinders and spheres`;
+
+  const loadSample = () => {
+    setContent(SAMPLE_CONTENT);
+    setFileName("Area_and_Volume_Lesson.txt");
+    stopReading();
+  };
 
   const synth = window.speechSynthesis;
   const utteranceRef = useRef<SpeechSynthesisUtterance | null>(null);
@@ -77,14 +163,56 @@ export default function App() {
     return () => { synth.onvoiceschanged = null; };
   }, [selectedVoice, synth]);
 
-  // Process text into words
+  // Process text into structured lines and words
   useEffect(() => {
     if (content) {
-      const splitWords = content.split(/\s+/).map((text, index) => ({ text, index }));
-      setWords(splitWords);
-      wordRefs.current = new Array(splitWords.length).fill(null);
+      const lines = content.split('\n');
+      const allWords: Word[] = [];
+      let globalWordIndex = 0;
+
+      const structured = lines.map(lineText => {
+        const trimmed = lineText.trim();
+        const isEmpty = trimmed === '';
+        
+        // Simple heuristic for headers
+        const isHeader = !isEmpty && (
+          trimmed.length < 40 && 
+          (
+            /^[A-Z][a-z]+(\s[A-Z][a-z]+)*$/.test(trimmed) || 
+            trimmed.endsWith(':') ||
+            lineText.startsWith('Topic Title') ||
+            lineText.startsWith('Overview') ||
+            lineText.startsWith('Prerequisites') ||
+            lineText.startsWith('Understanding') ||
+            lineText.startsWith('Key Points') ||
+            lineText.startsWith('Definitions') ||
+            lineText.startsWith('Common Misconceptions') ||
+            lineText.startsWith('Practice Questions') ||
+            lineText.startsWith('Real-World Applications') ||
+            lineText.startsWith('Resources') ||
+            lineText.startsWith('Next Steps')
+          )
+        );
+
+        const lineWords = trimmed.split(/\s+/).filter(w => w !== '').map(text => {
+          const word = { text, index: globalWordIndex++ };
+          allWords.push(word);
+          return word;
+        });
+
+        return {
+          words: lineWords,
+          isHeader,
+          isEmpty
+        };
+      });
+
+      setWords(allWords);
+      setStructuredContent(structured);
+      wordRefs.current = new Array(allWords.length).fill(null);
     } else {
       setWords([]);
+      setStructuredContent([]);
     }
   }, [content]);
 
@@ -219,6 +347,19 @@ export default function App() {
       {/* Header */}
       <header className="p-6 flex justify-between items-center border-b border-white/10">
         <div className="flex items-center gap-3">
+          {content && (
+            <button 
+              onClick={() => {
+                stopReading();
+                setContent('');
+                setFileName(null);
+              }}
+              className="p-2 hover:bg-white/10 rounded-full transition-colors mr-2"
+              title="Go Back"
+            >
+              <ChevronLeft size={24} />
+            </button>
+          )}
           <div className="w-10 h-10 bg-orange-500 rounded-full flex items-center justify-center">
             <FileText className="text-white" size={20} />
           </div>
@@ -272,6 +413,15 @@ export default function App() {
                   <h2 className="text-2xl font-semibold mb-2">Drop your file here</h2>
                   <p className="opacity-50">Supports PDF, TXT, and Markdown</p>
                 </div>
+                <button 
+                  onClick={(e) => {
+                    e.stopPropagation();
+                    loadSample();
+                  }}
+                  className="mt-4 bg-orange-500 hover:bg-orange-600 text-white px-6 py-2 rounded-full text-sm font-medium transition-all shadow-lg shadow-orange-500/20"
+                >
+                  Load Grade 6 Math Sample
+                </button>
               </motion.div>
             </div>
           </div>
@@ -281,23 +431,34 @@ export default function App() {
               className="max-w-3xl mx-auto leading-relaxed"
               style={{ fontSize: `${fontSize}px` }}
             >
-              {words.map((word, i) => (
-                <span
-                  key={i}
-                  ref={(el) => { wordRefs.current[i] = el; }}
-                  onClick={() => {
-                    setCurrentWordIndex(i);
-                    startReading(i);
-                  }}
+              {structuredContent.map((line, lineIdx) => (
+                <div 
+                  key={lineIdx} 
                   className={cn(
-                    "inline-block mr-1.5 px-0.5 rounded transition-all cursor-pointer",
-                    currentWordIndex === i 
-                      ? "bg-orange-500 text-white scale-110 shadow-lg shadow-orange-500/20" 
-                      : "hover:bg-white/10"
+                    "mb-2 min-h-[1em]",
+                    line.isHeader ? "text-2xl font-bold mt-8 mb-4 text-orange-500" : "opacity-90",
+                    line.isEmpty ? "h-4" : ""
                   )}
                 >
-                  {word.text}
-                </span>
+                  {line.words.map((word) => (
+                    <span
+                      key={word.index}
+                      ref={(el) => { wordRefs.current[word.index] = el; }}
+                      onClick={() => {
+                        setCurrentWordIndex(word.index);
+                        startReading(word.index);
+                      }}
+                      className={cn(
+                        "inline-block mr-1.5 px-0.5 rounded transition-all cursor-pointer",
+                        currentWordIndex === word.index 
+                          ? "bg-orange-500 text-white scale-110 shadow-lg shadow-orange-500/20" 
+                          : "hover:bg-white/10"
+                      )}
+                    >
+                      {word.text}
+                    </span>
+                  ))}
+                </div>
               ))}
             </div>
           </div>
