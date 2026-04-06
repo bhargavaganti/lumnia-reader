@@ -1,0 +1,5 @@
+{
+  "name": "Lumina Reader",
+  "description": "An intelligent content reader that supports PDF and text files with real-time highlighting and voice controls.",
+  "requestFramePermissions": []
+}
