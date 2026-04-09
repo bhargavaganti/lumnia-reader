@@ -21,7 +21,10 @@ import {
   Rewind,
   Maximize2,
   Minimize2,
-  Type
+  Type,
+  BookOpen,
+  Presentation as PresentationIcon,
+  Download
 } from 'lucide-react';
 import { motion, AnimatePresence } from 'motion/react';
 import { clsx, type ClassValue } from 'clsx';
@@ -44,12 +47,28 @@ interface StructuredLine {
   isEmpty: boolean;
 }
 
+interface Slide {
+  title: string;
+  content: string[];
+  notes: string;
+  type: string;
+}
+
+interface Presentation {
+  title: string;
+  slides: Slide[];
+}
+
 // --- PDF Worker Setup ---
 // In a real environment, we'd use a CDN for the worker
 pdfjs.GlobalWorkerOptions.workerSrc = `https://cdnjs.cloudflare.com/ajax/libs/pdf.js/${pdfjs.version}/pdf.worker.min.mjs`;
 
 export default function App() {
   const [content, setContent] = useState<string>('');
+  const [presentation, setPresentation] = useState<Presentation | null>(null);
+  const [currentSlideIndex, setCurrentSlideIndex] = useState<number>(0);
+  const [viewMode, setViewMode] = useState<'home' | 'reader' | 'presentation'>('home');
+  const [isNotesVisible, setIsNotesVisible] = useState(true);
   const [words, setWords] = useState<Word[]>([]);
   const [structuredContent, setStructuredContent] = useState<StructuredLine[]>([]);
   const [currentWordIndex, setCurrentWordIndex] = useState<number>(-1);
@@ -138,10 +157,190 @@ Next Steps
 - Explore surface area of 3D shapes
 - Learn about volumes of other geometric shapes like cylinders and spheres`;
 
+  const SAMPLE_PPT: Presentation = {
+    title: "The Reign of Terror",
+    slides: [
+      {
+        title: "Introduction to the Reign of Terror",
+        content: [
+          "Understanding the Reign of Terror: A pivotal period during the French Revolution.",
+          "Explain Introduction to the Reign of Terror in a step-by-step way, include cause-and-effect detail, and relate it to The Reign of Terror with one concrete classroom scenario students can remember.",
+          "Explain Introduction to the Reign of Terror in a step-by-step way, include cause-and-effect detail, and relate it to The Reign of Terror with one concrete classroom scenario students can remember."
+        ],
+        notes: "Teacher study note for 'Introduction to the Reign of Terror': start with prior knowledge activation and teach this in clear steps. Pause for a 30-second understanding check after the second and fourth points, then address one likely misconception explicitly. Close by summarizing the takeaway sentence students should write in their notebooks.",
+        type: "title"
+      },
+      {
+        title: "What Was the Reign of Terror?",
+        content: [
+          "A period from September 1793 to July 1794 during the French Revolution.",
+          "Characterized by mass executions to protect revolutionary ideals and connect it to The Reign of Terror with a classroom example, a short explanation of why it matters, and one recall cue for students.",
+          "Led by radical leaders like Maximilien Robespierre and connect it to The Reign of Terror with a classroom example, a short explanation of why it matters, and one recall cue for students.",
+          "Targeted perceived enemies of the revolution, including nobility and common citizens.",
+          "Emphasized 'virtue through terror' as a guiding principle and connect it to The Reign of Terror with a classroom example, a short explanation of why it matters, and one recall cue for students."
+        ],
+        notes: "Teacher study note for 'What Was the Reign of Terror?': start with prior knowledge activation and teach this in clear steps. Pause for a 30-second understanding check after the second and fourth points, then address one likely misconception explicitly. Close by summarizing the takeaway sentence students should write in their notebooks.",
+        type: "content"
+      },
+      {
+        title: "Key Figures: Maximilien Robespierre",
+        content: [
+          "A leading figure advocating for extreme measures and connect it to The Reign of Terror with a classroom example, a short explanation of why it matters, and one recall cue for students.",
+          "Believed in using terror to achieve revolutionary goals and connect it to The Reign of Terror with a classroom example, a short explanation of why it matters, and one recall cue for students.",
+          "Played a central role in political purges and connect it to The Reign of Terror with a classroom example, a short explanation of why it matters, and one recall cue for students.",
+          "His leadership marked by the enforcement of the Law of Suspects.",
+          "Eventually executed, marking the end of the Terror and connect it to The Reign of Terror with a classroom example, a short explanation of why it matters, and one recall cue for students."
+        ],
+        notes: "Teacher study note for 'Key Figures: Maximilien Robespierre': start with prior knowledge activation and teach this in clear steps. Pause for a 30-second understanding check after the second and fourth points, then address one likely misconception explicitly. Close by summarizing the takeaway sentence students should write in their notebooks.",
+        type: "content"
+      },
+      {
+        title: "The Role of the Committee of Public Safety",
+        content: [
+          "Established to protect the newly formed republic against internal threats.",
+          "Led by revolutionary leaders including Robespierre and connect it to The Reign of Terror with a classroom example, a short explanation of why it matters, and one recall cue for students.",
+          "Implemented the Law of Suspects to identify enemies and connect it to The Reign of Terror with a classroom example, a short explanation of why it matters, and one recall cue for students.",
+          "Oversaw the arrest and execution of thousands and connect it to The Reign of Terror with a classroom example, a short explanation of why it matters, and one recall cue for students.",
+          "Instrumental in centralizing power during the revolution and connect it to The Reign of Terror with a classroom example, a short explanation of why it matters, and one recall cue for students."
+        ],
+        notes: "Teacher study note for 'The Role of the Committee of Public Safety': start with prior knowledge activation and teach this in clear steps. Pause for a 30-second understanding check after the second and fourth points, then address one likely misconception explicitly. Close by summarizing the takeaway sentence students should write in their notebooks.",
+        type: "content"
+      },
+      {
+        title: "The Guillotine: Symbol of Revolutionary Justice",
+        content: [
+          "Became a symbol of the Reign of Terror and connect it to The Reign of Terror with a classroom example, a short explanation of why it matters, and one recall cue for students.",
+          "Used for public executions to instill fear and connect it to The Reign of Terror with a classroom example, a short explanation of why it matters, and one recall cue for students.",
+          "Seen as a tool for delivering swift justice and connect it to The Reign of Terror with a classroom example, a short explanation of why it matters, and one recall cue for students.",
+          "Contributed to the culture of fear and control and connect it to The Reign of Terror with a classroom example, a short explanation of why it matters, and one recall cue for students.",
+          "Used against both high-profile figures and ordinary citizens and connect it to The Reign of Terror with a classroom example, a short explanation of why it matters, and one recall cue for students."
+        ],
+        notes: "Teacher study note for 'The Guillotine: Symbol of Revolutionary Justice': start with prior knowledge activation and teach this in clear steps. Pause for a 30-second understanding check after the second and fourth points, then address one likely misconception explicitly. Close by summarizing the takeaway sentence students should write in their notebooks.",
+        type: "content"
+      },
+      {
+        title: "Major Events: Key Executions",
+        content: [
+          "Execution of King Louis XVI in January 1793 and connect it to The Reign of Terror with a classroom example, a short explanation of why it matters, and one recall cue for students.",
+          "Marie Antoinette executed in October 1793 and connect it to The Reign of Terror with a classroom example, a short explanation of why it matters, and one recall cue for students.",
+          "Execution of political rivals like Georges Danton and connect it to The Reign of Terror with a classroom example, a short explanation of why it matters, and one recall cue for students.",
+          "Widespread purges of perceived enemies and connect it to The Reign of Terror with a classroom example, a short explanation of why it matters, and one recall cue for students.",
+          "Marked by the consolidation of radical power and connect it to The Reign of Terror with a classroom example, a short explanation of why it matters, and one recall cue for students."
+        ],
+        notes: "Teacher study note for 'Major Events: Key Executions': start with prior knowledge activation and teach this in clear steps. Pause for a 30-second understanding check after the second and fourth points, then address one likely misconception explicitly. Close by summarizing the takeaway sentence students should write in their notebooks.",
+        type: "content"
+      },
+      {
+        title: "Political Tensions and Violence",
+        content: [
+          "The Law of Suspects widened the scope of arrests and connect it to The Reign of Terror with a classroom example, a short explanation of why it matters, and one recall cue for students.",
+          "Revolutionary tribunals expedited trials and executions and connect it to The Reign of Terror with a classroom example, a short explanation of why it matters, and one recall cue for students.",
+          "Fear used as a tool to suppress dissent and connect it to The Reign of Terror with a classroom example, a short explanation of why it matters, and one recall cue for students.",
+          "Elimination of political rivals to maintain power and connect it to The Reign of Terror with a classroom example, a short explanation of why it matters, and one recall cue for students.",
+          "Violence seen as necessary for revolutionary success and connect it to The Reign of Terror with a classroom example, a short explanation of why it matters, and one recall cue for students."
+        ],
+        notes: "Teacher study note for 'Political Tensions and Violence': start with prior knowledge activation and teach this in clear steps. Pause for a 30-second understanding check after the second and fourth points, then address one likely misconception explicitly. Close by summarizing the takeaway sentence students should write in their notebooks.",
+        type: "content"
+      },
+      {
+        title: "Impact on Society",
+        content: [
+          "Short-term: Strengthened radical control and connect it to The Reign of Terror with a classroom example, a short explanation of why it matters, and one recall cue for students.",
+          "Long-term: Influenced views on state power and human rights and connect it to The Reign of Terror with a classroom example, a short explanation of why it matters, and one recall cue for students.",
+          "Brought about changes in the French political landscape and connect it to The Reign of Terror with a classroom example, a short explanation of why it matters, and one recall cue for students.",
+          "Highlighted the dangers of extremist ideologies and connect it to The Reign of Terror with a classroom example, a short explanation of why it matters, and one recall cue for students.",
+          "Set the stage for future political reforms and connect it to The Reign of Terror with a classroom example, a short explanation of why it matters, and one recall cue for students."
+        ],
+        notes: "Teacher study note for 'Impact on Society': start with prior knowledge activation and teach this in clear steps. Pause for a 30-second understanding check after the second and fourth points, then address one likely misconception explicitly. Close by summarizing the takeaway sentence students should write in their notebooks.",
+        type: "content"
+      },
+      {
+        title: "Common Misconceptions",
+        content: [
+          "Misconception: Only the nobility was targeted and connect it to The Reign of Terror with a classroom example, a short explanation of why it matters, and one recall cue for students.",
+          "Correction: Many common citizens were also executed and connect it to The Reign of Terror with a classroom example, a short explanation of why it matters, and one recall cue for students.",
+          "Misunderstanding about the motives behind the Terror and connect it to The Reign of Terror with a classroom example, a short explanation of why it matters, and one recall cue for students.",
+          "The role of fear and control often oversimplified and connect it to The Reign of Terror with a classroom example, a short explanation of why it matters, and one recall cue for students.",
+          "The extent of the Terror's impact on all social classes."
+        ],
+        notes: "Teacher study note for 'Common Misconceptions': start with prior knowledge activation and teach this in clear steps. Pause for a 30-second understanding check after the second and fourth points, then address one likely misconception explicitly. Close by summarizing the takeaway sentence students should write in their notebooks.",
+        type: "content"
+      },
+      {
+        title: "Real World Connections",
+        content: [
+          "Understanding political fear tactics in today's world and connect it to The Reign of Terror with a classroom example, a short explanation of why it matters, and one recall cue for students.",
+          "Analyzing the impact of extremist ideologies on governance and connect it to The Reign of Terror with a classroom example, a short explanation of why it matters, and one recall cue for students.",
+          "Lessons on the balance between security and liberty and connect it to The Reign of Terror with a classroom example, a short explanation of why it matters, and one recall cue for students.",
+          "Historical examples of power consolidation through fear and connect it to The Reign of Terror with a classroom example, a short explanation of why it matters, and one recall cue for students.",
+          "Implications for modern democratic societies and connect it to The Reign of Terror with a classroom example, a short explanation of why it matters, and one recall cue for students."
+        ],
+        notes: "Teacher study note for 'Real World Connections': start with prior knowledge activation and teach this in clear steps. Pause for a 30-second understanding check after the second and fourth points, then address one likely misconception explicitly. Close by summarizing the takeaway sentence students should write in their notebooks.",
+        type: "content"
+      },
+      {
+        title: "Lesson Summary",
+        content: [
+          "Recap of the Reign of Terror's causes, events, and impacts.",
+          "Key figures and their roles in the Terror and connect it to The Reign of Terror with a classroom example, a short explanation of why it matters, and one recall cue for students.",
+          "Major events and societal impacts discussed and connect it to The Reign of Terror with a classroom example, a short explanation of why it matters, and one recall cue for students.",
+          "Understanding misconceptions and their corrections and connect it to The Reign of Terror with a classroom example, a short explanation of why it matters, and one recall cue for students.",
+          "Connections to modern political systems highlighted and connect it to The Reign of Terror with a classroom example, a short explanation of why it matters, and one recall cue for students."
+        ],
+        notes: "Teacher study note for 'Lesson Summary': start with prior knowledge activation and teach this in clear steps. Pause for a 30-second understanding check after the second and fourth points, then address one likely misconception explicitly. Close by summarizing the takeaway sentence students should write in their notebooks.",
+        type: "summary"
+      },
+      {
+        title: "Preview of Next Lesson",
+        content: [
+          "Explore Napoleon's rise to power post-Reign of Terror and connect it to The Reign of Terror with a classroom example, a short explanation of why it matters, and one recall cue for students.",
+          "Understand the transition from revolutionary France to empire and connect it to The Reign of Terror with a classroom example, a short explanation of why it matters, and one recall cue for students.",
+          "Analyze the impacts of Napoleon's rule on France and Europe.",
+          "Study the legacy of the French Revolution in shaping modern Europe.",
+          "Connect today's lesson to the upcoming exploration of Napoleon and connect it to The Reign of Terror with a classroom example, a short explanation of why it matters, and one recall cue for students."
+        ],
+        notes: "Teacher study note for 'Preview of Next Lesson': start with prior knowledge activation and teach this in clear steps. Pause for a 30-second understanding check after the second and fourth points, then address one likely misconception explicitly. Close by summarizing the takeaway sentence students should write in their notebooks.",
+        type: "content"
+      }
+    ]
+  };
+
   const loadSample = () => {
     setContent(SAMPLE_CONTENT);
     setFileName("Area_and_Volume_Lesson.txt");
+    setViewMode('reader');
     stopReading();
+  };
+
+  const loadPPTSample = () => {
+    setPresentation(SAMPLE_PPT);
+    setFileName("Reign_of_Terror_Presentation.json");
+    setViewMode('presentation');
+    setCurrentSlideIndex(0);
+    stopReading();
+  };
+
+  const downloadTemplate = () => {
+    const template = {
+      presentation: {
+        title: "Your Presentation Title",
+        slides: [
+          {
+            title: "Slide Title",
+            content: ["Bullet point 1", "Bullet point 2"],
+            notes: "Speaker notes or study guide content goes here.",
+            type: "content"
+          }
+        ]
+      }
+    };
+    const blob = new Blob([JSON.stringify(template, null, 2)], { type: 'application/json' });
+    const url = URL.createObjectURL(blob);
+    const a = document.createElement('a');
+    a.href = url;
+    a.download = 'presentation_template.json';
+    a.click();
+    URL.revokeObjectURL(url);
   };
 
   const synth = window.speechSynthesis;
@@ -165,8 +364,17 @@ Next Steps
 
   // Process text into structured lines and words
   useEffect(() => {
-    if (content) {
-      const lines = content.split('\n');
+    let textToProcess = '';
+    if (viewMode === 'reader' && content) {
+      textToProcess = content;
+    } else if (viewMode === 'presentation' && presentation) {
+      const slide = presentation.slides[currentSlideIndex];
+      // Only include notes in the words array (for reading) if they are visible
+      textToProcess = `${slide.title}\n\n${slide.content.join('\n')}${isNotesVisible ? `\n\nNotes: ${slide.notes}` : ''}`;
+    }
+
+    if (textToProcess) {
+      const lines = textToProcess.split('\n');
       const allWords: Word[] = [];
       let globalWordIndex = 0;
 
@@ -190,7 +398,8 @@ Next Steps
             lineText.startsWith('Practice Questions') ||
             lineText.startsWith('Real-World Applications') ||
             lineText.startsWith('Resources') ||
-            lineText.startsWith('Next Steps')
+            lineText.startsWith('Next Steps') ||
+            (viewMode === 'presentation' && (lineText === presentation?.slides[currentSlideIndex].title || lineText.startsWith('Notes:')))
           )
         );
 
@@ -214,7 +423,7 @@ Next Steps
       setWords([]);
       setStructuredContent([]);
     }
-  }, [content]);
+  }, [content, presentation, currentSlideIndex, viewMode]);
 
   // Auto-scroll to current word
   useEffect(() => {
@@ -234,7 +443,7 @@ Next Steps
   }, [synth]);
 
   const startReading = useCallback((startIndex = 0) => {
-    if (!content) return;
+    if (words.length === 0) return;
 
     stopReading();
 
@@ -306,7 +515,36 @@ Next Steps
     stopReading();
 
     try {
-      if (file.type === 'application/pdf') {
+      if (file.type === 'application/json' || file.name.endsWith('.json')) {
+        const text = await file.text();
+        const json = JSON.parse(text);
+        
+        // Handle nested structure from user request
+        let presentationData = null;
+        if (json.presentation) {
+          presentationData = json.presentation;
+        } else if (json.data?.lesson_plan?.ppt_content?.presentation) {
+          presentationData = json.data.lesson_plan.ppt_content.presentation;
+        } else if (json.data?.lesson_plan?.content_metadata?.ppt_content?.presentation) {
+          presentationData = json.data.lesson_plan.content_metadata.ppt_content.presentation;
+        } else if (json.data?.versions && Array.isArray(json.data.versions)) {
+          // Find the latest version by version_number
+          const latest = json.data.versions.reduce((prev: any, current: any) => {
+            const prevNum = prev.version_number || 0;
+            const currNum = current.version_number || 0;
+            return (prevNum > currNum) ? prev : current;
+          }, json.data.versions[0]);
+          presentationData = latest?.ppt_content?.presentation;
+        }
+
+        if (presentationData) {
+          setPresentation(presentationData);
+          setViewMode('presentation');
+          setCurrentSlideIndex(0);
+        } else {
+          throw new Error('Invalid presentation format');
+        }
+      } else if (file.type === 'application/pdf') {
         const arrayBuffer = await file.arrayBuffer();
         const pdf = await pdfjs.getDocument({ data: arrayBuffer }).promise;
         let fullText = '';
@@ -317,9 +555,11 @@ Next Steps
           fullText += pageText + '\n';
         }
         setContent(fullText);
+        setViewMode('reader');
       } else {
         const text = await file.text();
         setContent(text);
+        setViewMode('reader');
       }
     } catch (error) {
       console.error('Error reading file:', error);
@@ -331,12 +571,13 @@ Next Steps
 
   const { getRootProps, getInputProps, isDragActive } = useDropzone({
     onDrop: handleFileUpload,
+    multiple: false,
     accept: {
       'text/plain': ['.txt'],
       'application/pdf': ['.pdf'],
-      'text/markdown': ['.md']
-    },
-    multiple: false
+      'text/markdown': ['.md'],
+      'application/json': ['.json']
+    }
   });
 
   return (
@@ -347,12 +588,14 @@ Next Steps
       {/* Header */}
       <header className="p-6 flex justify-between items-center border-b border-white/10">
         <div className="flex items-center gap-3">
-          {content && (
+          {viewMode !== 'home' && (
             <button 
               onClick={() => {
                 stopReading();
                 setContent('');
+                setPresentation(null);
                 setFileName(null);
+                setViewMode('home');
               }}
               className="p-2 hover:bg-white/10 rounded-full transition-colors mr-2"
               title="Go Back"
@@ -390,7 +633,7 @@ Next Steps
 
       {/* Main Content */}
       <main className="flex-1 relative flex flex-col overflow-hidden">
-        {!content ? (
+        {viewMode === 'home' ? (
           <div className="flex-1 flex flex-col items-center justify-center p-10">
             <div 
               {...getRootProps()}
@@ -411,21 +654,63 @@ Next Steps
                 </div>
                 <div className="text-center pointer-events-none">
                   <h2 className="text-2xl font-semibold mb-2">Drop your file here</h2>
-                  <p className="opacity-50">Supports PDF, TXT, and Markdown</p>
+                  <p className="opacity-50">Supports PDF, TXT, MD, and JSON (PPT)</p>
                 </div>
-                <button 
-                  onClick={(e) => {
-                    e.stopPropagation();
-                    loadSample();
-                  }}
-                  className="mt-4 bg-orange-500 hover:bg-orange-600 text-white px-6 py-2 rounded-full text-sm font-medium transition-all shadow-lg shadow-orange-500/20"
-                >
-                  Load Grade 6 Math Sample
-                </button>
+                <div className="flex flex-col gap-3 mt-4 w-full">
+                  <button 
+                    onClick={(e) => {
+                      e.stopPropagation();
+                      loadSample();
+                    }}
+                    className="bg-orange-500 hover:bg-orange-600 text-white px-6 py-3 rounded-2xl text-sm font-bold transition-all shadow-lg shadow-orange-500/20 flex items-center justify-center gap-2"
+                  >
+                    <BookOpen size={18} />
+                    Load Grade 6 Math Sample
+                  </button>
+                  <button 
+                    onClick={(e) => {
+                      e.stopPropagation();
+                      loadPPTSample();
+                    }}
+                    className="bg-white/10 hover:bg-white/20 text-white px-6 py-3 rounded-2xl text-sm font-bold transition-all border border-white/10 flex items-center justify-center gap-2"
+                  >
+                    <PresentationIcon size={18} />
+                    Load French Revolution PPT Sample
+                  </button>
+                  <div className="grid grid-cols-2 gap-3">
+                    <button 
+                      onClick={(e) => {
+                        e.stopPropagation();
+                        const input = document.createElement('input');
+                        input.type = 'file';
+                        input.accept = '.json';
+                        input.onchange = (event: any) => {
+                          const file = event.target.files[0];
+                          if (file) handleFileUpload([file]);
+                        };
+                        input.click();
+                      }}
+                      className="bg-white/5 hover:bg-white/10 text-white px-4 py-3 rounded-2xl text-xs font-bold transition-all border border-white/5 flex items-center justify-center gap-2"
+                    >
+                      <Upload size={14} />
+                      Import JSON
+                    </button>
+                    <button 
+                      onClick={(e) => {
+                        e.stopPropagation();
+                        downloadTemplate();
+                      }}
+                      className="bg-white/5 hover:bg-white/10 text-white px-4 py-3 rounded-2xl text-xs font-bold transition-all border border-white/5 flex items-center justify-center gap-2"
+                    >
+                      <Download size={14} />
+                      Get Template
+                    </button>
+                  </div>
+                </div>
               </motion.div>
             </div>
           </div>
-        ) : (
+        ) : viewMode === 'reader' ? (
           <div className="flex-1 overflow-y-auto px-6 py-10 md:px-20 lg:px-40" ref={scrollRef}>
             <div 
               className="max-w-3xl mx-auto leading-relaxed"
@@ -462,6 +747,146 @@ Next Steps
               ))}
             </div>
           </div>
+        ) : (
+          <div className="flex-1 flex flex-col items-center justify-center p-4 md:p-8 overflow-hidden relative">
+            <AnimatePresence mode="wait">
+              <motion.div 
+                key={currentSlideIndex}
+                initial={{ opacity: 0, scale: 0.95 }}
+                animate={{ opacity: 1, scale: 1 }}
+                exit={{ opacity: 0, scale: 1.05 }}
+                className={cn(
+                  "w-full max-w-6xl h-[80vh] rounded-3xl flex flex-col md:flex-row shadow-2xl relative overflow-hidden transition-all duration-500",
+                  isDarkMode ? "bg-[#1a1a1a] border border-white/10" : "bg-white border border-black/5"
+                )}
+              >
+                {/* Main Slide Area */}
+                <div className="flex-[3] flex flex-col p-8 md:p-12 overflow-hidden border-r border-white/5 relative">
+                  {/* Toggle Notes Button (Floating) */}
+                  <button 
+                    onClick={() => setIsNotesVisible(!isNotesVisible)}
+                    className={cn(
+                      "absolute top-8 right-8 p-3 rounded-xl transition-all z-10 flex items-center gap-2 text-xs font-bold uppercase tracking-widest",
+                      isNotesVisible 
+                        ? "bg-orange-500 text-white shadow-lg shadow-orange-500/20" 
+                        : "bg-white/5 hover:bg-white/10 text-orange-500 border border-orange-500/20"
+                    )}
+                  >
+                    <Type size={16} />
+                    {isNotesVisible ? "Hide Notes" : "Show Notes"}
+                  </button>
+
+                  <div className="flex-1 overflow-y-auto pr-4 custom-scrollbar" ref={scrollRef}>
+                    {structuredContent.filter(line => !line.words.some(w => w.text.startsWith('Notes:'))).map((line, lineIdx) => (
+                      <div 
+                        key={lineIdx} 
+                        className={cn(
+                          "mb-6 min-h-[1em]",
+                          line.isHeader ? "text-4xl md:text-5xl font-black mb-10 text-orange-500 leading-tight" : "text-xl md:text-2xl opacity-90 leading-relaxed",
+                          line.isEmpty ? "h-6" : ""
+                        )}
+                      >
+                        {line.words.map((word) => (
+                          <span
+                            key={word.index}
+                            ref={(el) => { wordRefs.current[word.index] = el; }}
+                            onClick={() => {
+                              setCurrentWordIndex(word.index);
+                              startReading(word.index);
+                            }}
+                            className={cn(
+                              "inline-block mr-2 px-1 rounded transition-all cursor-pointer",
+                              currentWordIndex === word.index 
+                                ? "bg-orange-500 text-white scale-105 shadow-lg shadow-orange-500/20" 
+                                : "hover:bg-white/10"
+                            )}
+                          >
+                            {word.text}
+                          </span>
+                        ))}
+                      </div>
+                    ))}
+                  </div>
+
+                  {/* Slide Footer */}
+                  <div className="mt-8 flex justify-between items-center pt-6 border-t border-white/10">
+                    <div className="text-xs font-bold uppercase tracking-[0.2em] opacity-30">
+                      {presentation?.title} • Slide {currentSlideIndex + 1}
+                    </div>
+                    <div className="flex gap-3">
+                      <button 
+                        disabled={currentSlideIndex === 0}
+                        onClick={() => {
+                          stopReading();
+                          setCurrentSlideIndex(prev => prev - 1);
+                        }}
+                        className="p-3 bg-white/5 hover:bg-white/10 rounded-xl disabled:opacity-20 transition-all active:scale-90"
+                      >
+                        <ChevronLeft size={24} />
+                      </button>
+                      <button 
+                        disabled={currentSlideIndex === (presentation?.slides.length || 0) - 1}
+                        onClick={() => {
+                          stopReading();
+                          setCurrentSlideIndex(prev => prev + 1);
+                        }}
+                        className="p-3 bg-white/5 hover:bg-white/10 rounded-xl disabled:opacity-20 transition-all active:scale-90"
+                      >
+                        <ChevronRight size={24} />
+                      </button>
+                    </div>
+                  </div>
+                </div>
+
+                {/* Study Notes Sidebar (Collapsable) */}
+                <AnimatePresence>
+                  {isNotesVisible && (
+                    <motion.div 
+                      initial={{ width: 0, opacity: 0 }}
+                      animate={{ width: "33.333%", opacity: 1 }}
+                      exit={{ width: 0, opacity: 0 }}
+                      className={cn(
+                        "p-8 flex flex-col gap-6 overflow-hidden border-l border-white/5",
+                        isDarkMode ? "bg-white/5" : "bg-black/5"
+                      )}
+                    >
+                      <div className="flex items-center gap-2 text-orange-500 shrink-0">
+                        <Type size={18} />
+                        <span className="text-xs font-bold uppercase tracking-widest">Study Notes</span>
+                      </div>
+                      <div className="flex-1 overflow-y-auto pr-2 custom-scrollbar italic text-lg opacity-80 leading-relaxed">
+                        {structuredContent.filter(line => line.words.some(w => w.text.startsWith('Notes:'))).map((line, lineIdx) => (
+                          <div key={lineIdx}>
+                            {line.words.map((word) => (
+                              <span
+                                key={word.index}
+                                ref={(el) => { wordRefs.current[word.index] = el; }}
+                                onClick={() => {
+                                  setCurrentWordIndex(word.index);
+                                  startReading(word.index);
+                                }}
+                                className={cn(
+                                  "inline-block mr-1.5 px-0.5 rounded transition-all cursor-pointer",
+                                  currentWordIndex === word.index 
+                                    ? "bg-orange-500 text-white scale-105" 
+                                    : "hover:bg-white/10"
+                                )}
+                              >
+                                {word.text}
+                              </span>
+                            ))}
+                          </div>
+                        ))}
+                      </div>
+                      <div className="p-4 rounded-2xl bg-orange-500/10 border border-orange-500/20 text-xs text-orange-500 font-medium shrink-0">
+                        Notes are active. They will be read aloud after slide content.
+                      </div>
+                    </motion.div>
+                  )}
+                </AnimatePresence>
+              </motion.div>
+            </AnimatePresence>
+          </div>
         )}
 
         {/* Loading Overlay */}
@@ -483,7 +908,7 @@ Next Steps
       </main>
 
       {/* Controls Bar */}
-      {content && (
+      {viewMode !== 'home' && (
         <footer className={cn(
           "p-6 border-t backdrop-blur-xl sticky bottom-0 z-40",
           isDarkMode ? "bg-black/80 border-white/10" : "bg-white/80 border-black/10"
@@ -599,7 +1024,13 @@ Next Steps
                 </div>
                 
                 <button 
-                  onClick={() => setContent('')}
+                  onClick={() => {
+                    stopReading();
+                    setContent('');
+                    setPresentation(null);
+                    setFileName(null);
+                    setViewMode('home');
+                  }}
                   className="text-xs font-bold uppercase tracking-widest opacity-50 hover:opacity-100 transition-opacity"
                 >
                   Clear
