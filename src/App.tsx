@@ -83,6 +83,7 @@ export default function App() {
   const [selectedVoice, setSelectedVoice] = useState<string | null>(null);
   const [fontSize, setFontSize] = useState(18);
   const [isDarkMode, setIsDarkMode] = useState(true);
+  const [currentLang, setCurrentLang] = useState<'en' | 'hi'>('en');
 
   const SAMPLE_CONTENT = `Topic Title
 Area & Volume
@@ -157,166 +158,467 @@ Next Steps
 - Explore surface area of 3D shapes
 - Learn about volumes of other geometric shapes like cylinders and spheres`;
 
-  const SAMPLE_PPT: Presentation = {
+  const SAMPLE_PPT_EN: Presentation = {
     title: "The Reign of Terror",
     slides: [
       {
         title: "Introduction to the Reign of Terror",
         content: [
-          "Understanding the Reign of Terror: A pivotal period during the French Revolution.",
-          "Explain Introduction to the Reign of Terror in a step-by-step way, include cause-and-effect detail, and relate it to The Reign of Terror with one concrete classroom scenario students can remember.",
-          "Explain Introduction to the Reign of Terror in a step-by-step way, include cause-and-effect detail, and relate it to The Reign of Terror with one concrete classroom scenario students can remember."
+          "Examination of the Reign of Terror during the French Revolution.",
+          "Understanding its role and impact on French history.",
+          "Exploration of the political and social dynamics leading to this period.",
+          "Setting the stage for the emergence of revolutionary fervor."
         ],
-        notes: "Teacher study note for 'Introduction to the Reign of Terror': start with prior knowledge activation and teach this in clear steps. Pause for a 30-second understanding check after the second and fourth points, then address one likely misconception explicitly. Close by summarizing the takeaway sentence students should write in their notebooks.",
+        notes: "Introduce the Reign of Terror as a pivotal era in revolutionary France. Emphasize its historical importance. Address misconceptions about its scope and impact on various societal layers.",
         type: "title"
       },
       {
         title: "What Was the Reign of Terror?",
         content: [
-          "A period from September 1793 to July 1794 during the French Revolution.",
-          "Characterized by mass executions to protect revolutionary ideals and connect it to The Reign of Terror with a classroom example, a short explanation of why it matters, and one recall cue for students.",
-          "Led by radical leaders like Maximilien Robespierre and connect it to The Reign of Terror with a classroom example, a short explanation of why it matters, and one recall cue for students.",
-          "Targeted perceived enemies of the revolution, including nobility and common citizens.",
-          "Emphasized 'virtue through terror' as a guiding principle and connect it to The Reign of Terror with a classroom example, a short explanation of why it matters, and one recall cue for students."
+          "A turbulent and radical phase of the French Revolution.",
+          "Characterized by the mass execution of perceived revolution enemies.",
+          "Spanned from September 1793 to July 1794.",
+          "Led predominantly by the Committee of Public Safety.",
+          "Aimed at protecting the revolution from internal and external threats.",
+          "Promoted the concept of 'virtue through terror' to maintain revolutionary ideals.",
+          "Implemented harsh legal measures like the Law of Suspects.",
+          "Resulted in the execution of thousands, including notable figures."
         ],
-        notes: "Teacher study note for 'What Was the Reign of Terror?': start with prior knowledge activation and teach this in clear steps. Pause for a 30-second understanding check after the second and fourth points, then address one likely misconception explicitly. Close by summarizing the takeaway sentence students should write in their notebooks.",
+        notes: "Clarify the timeline and objectives of this period. Emphasize the role of key revolutionary bodies and leaders. Discuss the societal pressures that fueled such radical actions.",
         type: "content"
       },
       {
-        title: "Key Figures: Maximilien Robespierre",
+        title: "Maximilien Robespierre: A Central Figure",
         content: [
-          "A leading figure advocating for extreme measures and connect it to The Reign of Terror with a classroom example, a short explanation of why it matters, and one recall cue for students.",
-          "Believed in using terror to achieve revolutionary goals and connect it to The Reign of Terror with a classroom example, a short explanation of why it matters, and one recall cue for students.",
-          "Played a central role in political purges and connect it to The Reign of Terror with a classroom example, a short explanation of why it matters, and one recall cue for students.",
-          "His leadership marked by the enforcement of the Law of Suspects.",
-          "Eventually executed, marking the end of the Terror and connect it to The Reign of Terror with a classroom example, a short explanation of why it matters, and one recall cue for students."
+          "Robespierre was an influential Jacobin leader.",
+          "Advocated for stringent measures to protect the revolution.",
+          "Instrumental in the establishment of the Reign of Terror.",
+          "His policies were marked by radical and unyielding approaches.",
+          "Influence led to the implementation of the Law of Suspects.",
+          "His downfall mirrored the collapse of the Terror's extreme measures.",
+          "Robespierre's legacy remains controversial and debated.",
+          "Symbolized the extremes of revolutionary zeal and its consequences."
         ],
-        notes: "Teacher study note for 'Key Figures: Maximilien Robespierre': start with prior knowledge activation and teach this in clear steps. Pause for a 30-second understanding check after the second and fourth points, then address one likely misconception explicitly. Close by summarizing the takeaway sentence students should write in their notebooks.",
+        notes: "Discuss Robespierre's role and influence during the Reign of Terror. Highlight his contribution to revolutionary policies and his ultimate demise. Address misconceptions about his intentions and the public's view of his actions.",
         type: "content"
       },
       {
-        title: "The Role of the Committee of Public Safety",
+        title: "Role of the Committee of Public Safety",
         content: [
-          "Established to protect the newly formed republic against internal threats.",
-          "Led by revolutionary leaders including Robespierre and connect it to The Reign of Terror with a classroom example, a short explanation of why it matters, and one recall cue for students.",
-          "Implemented the Law of Suspects to identify enemies and connect it to The Reign of Terror with a classroom example, a short explanation of why it matters, and one recall cue for students.",
-          "Oversaw the arrest and execution of thousands and connect it to The Reign of Terror with a classroom example, a short explanation of why it matters, and one recall cue for students.",
-          "Instrumental in centralizing power during the revolution and connect it to The Reign of Terror with a classroom example, a short explanation of why it matters, and one recall cue for students."
+          "Formed to defend the revolution against internal threats.",
+          "Comprised of powerful figures like Robespierre and Danton.",
+          "Became the de facto governing body during the Terror.",
+          "Oversaw the implementation of revolutionary laws and decrees.",
+          "Directed mass arrests, trials, and executions.",
+          "Sought to centralize control and eliminate opposition.",
+          "Facilitated the rise of radical policies and actions.",
+          "Played a crucial role in the escalation of revolutionary violence."
         ],
-        notes: "Teacher study note for 'The Role of the Committee of Public Safety': start with prior knowledge activation and teach this in clear steps. Pause for a 30-second understanding check after the second and fourth points, then address one likely misconception explicitly. Close by summarizing the takeaway sentence students should write in their notebooks.",
+        notes: "Explain the committee's formation and its significant influence. Highlight its strategies and the authoritative role it assumed. Discuss the implications of its decisions on French society.",
         type: "content"
       },
       {
         title: "The Guillotine: Symbol of Revolutionary Justice",
         content: [
-          "Became a symbol of the Reign of Terror and connect it to The Reign of Terror with a classroom example, a short explanation of why it matters, and one recall cue for students.",
-          "Used for public executions to instill fear and connect it to The Reign of Terror with a classroom example, a short explanation of why it matters, and one recall cue for students.",
-          "Seen as a tool for delivering swift justice and connect it to The Reign of Terror with a classroom example, a short explanation of why it matters, and one recall cue for students.",
-          "Contributed to the culture of fear and control and connect it to The Reign of Terror with a classroom example, a short explanation of why it matters, and one recall cue for students.",
-          "Used against both high-profile figures and ordinary citizens and connect it to The Reign of Terror with a classroom example, a short explanation of why it matters, and one recall cue for students."
+          "Became an emblematic symbol of the Reign of Terror.",
+          "Used extensively for public executions to instill fear.",
+          "Represented swift and egalitarian justice under revolutionary law.",
+          "Contributed to a culture of fear and compliance.",
+          "Targeted both prominent figures and ordinary citizens.",
+          "Became central to the political and social narrative of the time.",
+          "Public executions were spectacles designed to reinforce power.",
+          "Its legacy persists as a reminder of the era's brutality."
         ],
-        notes: "Teacher study note for 'The Guillotine: Symbol of Revolutionary Justice': start with prior knowledge activation and teach this in clear steps. Pause for a 30-second understanding check after the second and fourth points, then address one likely misconception explicitly. Close by summarizing the takeaway sentence students should write in their notebooks.",
+        notes: "Describe the guillotine's role and symbolism during this period. Discuss its impact on public perception and the atmosphere of fear. Clarify any misconceptions about its application and significance.",
         type: "content"
       },
       {
-        title: "Major Events: Key Executions",
+        title: "Key Events: High-Profile Executions",
         content: [
-          "Execution of King Louis XVI in January 1793 and connect it to The Reign of Terror with a classroom example, a short explanation of why it matters, and one recall cue for students.",
-          "Marie Antoinette executed in October 1793 and connect it to The Reign of Terror with a classroom example, a short explanation of why it matters, and one recall cue for students.",
-          "Execution of political rivals like Georges Danton and connect it to The Reign of Terror with a classroom example, a short explanation of why it matters, and one recall cue for students.",
-          "Widespread purges of perceived enemies and connect it to The Reign of Terror with a classroom example, a short explanation of why it matters, and one recall cue for students.",
-          "Marked by the consolidation of radical power and connect it to The Reign of Terror with a classroom example, a short explanation of why it matters, and one recall cue for students."
+          "Execution of King Louis XVI in January 1793 marked a turning point.",
+          "Marie Antoinette's execution followed in October 1793.",
+          "Political rival Georges Danton was also executed.",
+          "Widespread purges targeted perceived enemies and dissidents.",
+          "These events consolidated revolutionary power through terror.",
+          "Public executions served as demonstrations of revolutionary resolve.",
+          "Highlighted the regime's willingness to eliminate opposition.",
+          "Created a climate of fear that permeated French society."
         ],
-        notes: "Teacher study note for 'Major Events: Key Executions': start with prior knowledge activation and teach this in clear steps. Pause for a 30-second understanding check after the second and fourth points, then address one likely misconception explicitly. Close by summarizing the takeaway sentence students should write in their notebooks.",
+        notes: "Review significant executions and their implications. Discuss the impact on the revolution's political dynamics. Address misconceptions about the scale and targets of these actions.",
         type: "content"
       },
       {
-        title: "Political Tensions and Violence",
+        title: "Political Tensions and Law of Suspects",
         content: [
-          "The Law of Suspects widened the scope of arrests and connect it to The Reign of Terror with a classroom example, a short explanation of why it matters, and one recall cue for students.",
-          "Revolutionary tribunals expedited trials and executions and connect it to The Reign of Terror with a classroom example, a short explanation of why it matters, and one recall cue for students.",
-          "Fear used as a tool to suppress dissent and connect it to The Reign of Terror with a classroom example, a short explanation of why it matters, and one recall cue for students.",
-          "Elimination of political rivals to maintain power and connect it to The Reign of Terror with a classroom example, a short explanation of why it matters, and one recall cue for students.",
-          "Violence seen as necessary for revolutionary success and connect it to The Reign of Terror with a classroom example, a short explanation of why it matters, and one recall cue for students."
+          "The Law of Suspects broadened the scope of arrests.",
+          "Revolutionary tribunals expedited trials and executions.",
+          "Fear was employed to suppress dissent and control population.",
+          "Elimination of political rivals was a method to maintain power.",
+          "The law was used to justify widespread purges.",
+          "Contributed to the atmosphere of paranoia and suspicion.",
+          "Revolutionary justice was often arbitrary and brutal.",
+          "Reinforced the dominance of radical revolutionary factions."
         ],
-        notes: "Teacher study note for 'Political Tensions and Violence': start with prior knowledge activation and teach this in clear steps. Pause for a 30-second understanding check after the second and fourth points, then address one likely misconception explicitly. Close by summarizing the takeaway sentence students should write in their notebooks.",
+        notes: "Explain the political climate and the use of fear as a tool. Discuss the rationale behind the legal measures and their effects. Address misconceptions about the motivations behind these actions.",
         type: "content"
       },
       {
-        title: "Impact on Society",
+        title: "Social and Cultural Impact",
         content: [
-          "Short-term: Strengthened radical control and connect it to The Reign of Terror with a classroom example, a short explanation of why it matters, and one recall cue for students.",
-          "Long-term: Influenced views on state power and human rights and connect it to The Reign of Terror with a classroom example, a short explanation of why it matters, and one recall cue for students.",
-          "Brought about changes in the French political landscape and connect it to The Reign of Terror with a classroom example, a short explanation of why it matters, and one recall cue for students.",
-          "Highlighted the dangers of extremist ideologies and connect it to The Reign of Terror with a classroom example, a short explanation of why it matters, and one recall cue for students.",
-          "Set the stage for future political reforms and connect it to The Reign of Terror with a classroom example, a short explanation of why it matters, and one recall cue for students."
+          "Short-term: Strengthened radical control over France.",
+          "Long-term: Influenced perceptions of state power and human rights.",
+          "Brought about significant shifts in the French political landscape.",
+          "Highlighted the dangers associated with extremist ideologies.",
+          "Set the stage for future political reforms in France.",
+          "Impacted the collective consciousness of the French populace.",
+          "Altered the course of the revolutionary government’s policies.",
+          "Contributed to a legacy of caution against absolute power."
         ],
-        notes: "Teacher study note for 'Impact on Society': start with prior knowledge activation and teach this in clear steps. Pause for a 30-second understanding check after the second and fourth points, then address one likely misconception explicitly. Close by summarizing the takeaway sentence students should write in their notebooks.",
+        notes: "Discuss the societal impacts of the Reign of Terror in both immediate and long-term contexts. Highlight the changes in political and social structures. Address misconceptions about its lasting effects.",
         type: "content"
       },
       {
         title: "Common Misconceptions",
         content: [
-          "Misconception: Only the nobility was targeted and connect it to The Reign of Terror with a classroom example, a short explanation of why it matters, and one recall cue for students.",
-          "Correction: Many common citizens were also executed and connect it to The Reign of Terror with a classroom example, a short explanation of why it matters, and one recall cue for students.",
-          "Misunderstanding about the motives behind the Terror and connect it to The Reign of Terror with a classroom example, a short explanation of why it matters, and one recall cue for students.",
-          "The role of fear and control often oversimplified and connect it to The Reign of Terror with a classroom example, a short explanation of why it matters, and one recall cue for students.",
-          "The extent of the Terror's impact on all social classes."
+          "Misconception: Only the nobility was targeted during the Terror.",
+          "Correction: Many common citizens were also executed.",
+          "Misunderstandings about the motivations behind the Terror.",
+          "Simplification of the role of fear and control in revolutionary France.",
+          "Extent of the Terror's impact on all social classes often underestimated.",
+          "The narrative of the Terror is more complex than often portrayed.",
+          "Perception that the Terror was solely a result of radicalism.",
+          "Importance of understanding the broader historical context."
         ],
-        notes: "Teacher study note for 'Common Misconceptions': start with prior knowledge activation and teach this in clear steps. Pause for a 30-second understanding check after the second and fourth points, then address one likely misconception explicitly. Close by summarizing the takeaway sentence students should write in their notebooks.",
+        notes: "Clarify misconceptions regarding the Reign of Terror. Provide corrections with historical evidence. Prepare to address questions about the broader implications and nuances of this period.",
         type: "content"
       },
       {
         title: "Real World Connections",
         content: [
-          "Understanding political fear tactics in today's world and connect it to The Reign of Terror with a classroom example, a short explanation of why it matters, and one recall cue for students.",
-          "Analyzing the impact of extremist ideologies on governance and connect it to The Reign of Terror with a classroom example, a short explanation of why it matters, and one recall cue for students.",
-          "Lessons on the balance between security and liberty and connect it to The Reign of Terror with a classroom example, a short explanation of why it matters, and one recall cue for students.",
-          "Historical examples of power consolidation through fear and connect it to The Reign of Terror with a classroom example, a short explanation of why it matters, and one recall cue for students.",
-          "Implications for modern democratic societies and connect it to The Reign of Terror with a classroom example, a short explanation of why it matters, and one recall cue for students."
+          "Understanding political fear tactics in today’s governance.",
+          "Analyzing the impact of extremist ideologies on governments.",
+          "Lessons on balancing security and liberty in modern states.",
+          "Historical examples of power consolidation through fear.",
+          "Implications for modern democratic societies and their governance.",
+          "Exploring how history informs current political strategies.",
+          "Recognizing the signs of authoritarian tendencies in leadership.",
+          "Evaluating the long-term effects of revolutionary and radical policies."
         ],
-        notes: "Teacher study note for 'Real World Connections': start with prior knowledge activation and teach this in clear steps. Pause for a 30-second understanding check after the second and fourth points, then address one likely misconception explicitly. Close by summarizing the takeaway sentence students should write in their notebooks.",
+        notes: "Connect historical events to contemporary political contexts. Discuss the relevance of the Reign of Terror in modern governance. Encourage students to reflect on historical lessons applicable today.",
         type: "content"
       },
       {
         title: "Lesson Summary",
         content: [
-          "Recap of the Reign of Terror's causes, events, and impacts.",
-          "Key figures and their roles in the Terror and connect it to The Reign of Terror with a classroom example, a short explanation of why it matters, and one recall cue for students.",
-          "Major events and societal impacts discussed and connect it to The Reign of Terror with a classroom example, a short explanation of why it matters, and one recall cue for students.",
-          "Understanding misconceptions and their corrections and connect it to The Reign of Terror with a classroom example, a short explanation of why it matters, and one recall cue for students.",
-          "Connections to modern political systems highlighted and connect it to The Reign of Terror with a classroom example, a short explanation of why it matters, and one recall cue for students."
+          "Recap of the Reign of Terror’s causes, events, and impacts.",
+          "Discussion of key figures and their influential roles.",
+          "Review of major events and societal transformations.",
+          "Clarification of common misconceptions about this period.",
+          "Highlighting connections to modern political systems.",
+          "Reflection on the consequences of extremist governance."
         ],
-        notes: "Teacher study note for 'Lesson Summary': start with prior knowledge activation and teach this in clear steps. Pause for a 30-second understanding check after the second and fourth points, then address one likely misconception explicitly. Close by summarizing the takeaway sentence students should write in their notebooks.",
+        notes: "Summarize the key points covered in the lesson. Reinforce understanding of the Reign of Terror's complexity. Ensure students grasp the connections to modern issues and history.",
         type: "summary"
       },
       {
         title: "Preview of Next Lesson",
         content: [
-          "Explore Napoleon's rise to power post-Reign of Terror and connect it to The Reign of Terror with a classroom example, a short explanation of why it matters, and one recall cue for students.",
-          "Understand the transition from revolutionary France to empire and connect it to The Reign of Terror with a classroom example, a short explanation of why it matters, and one recall cue for students.",
-          "Analyze the impacts of Napoleon's rule on France and Europe.",
+          "Explore Napoleon’s rise to power following the Reign of Terror.",
+          "Understand the transition from revolutionary France to empire.",
+          "Analyze the impacts of Napoleon’s rule on France and Europe.",
           "Study the legacy of the French Revolution in shaping modern Europe.",
-          "Connect today's lesson to the upcoming exploration of Napoleon and connect it to The Reign of Terror with a classroom example, a short explanation of why it matters, and one recall cue for students."
+          "Connect today’s lesson to the upcoming exploration of Napoleon.",
+          "Preview of Next Lesson: include precise historical/context detail that clarifies the sequence of events around The Reign of Terror.",
+          "Highlight one cause-and-effect chain linked to The Reign of Terror and explain why it changed outcomes.",
+          "Add one concrete classroom example tied to Preview of Next Lesson so students can apply the concept accurately."
         ],
-        notes: "Teacher study note for 'Preview of Next Lesson': start with prior knowledge activation and teach this in clear steps. Pause for a 30-second understanding check after the second and fourth points, then address one likely misconception explicitly. Close by summarizing the takeaway sentence students should write in their notebooks.",
+        notes: "Provide a brief overview of what to expect in the next session. Build interest in the transition from revolution to empire. Highlight the continuity in the study of French history and its wider implications.",
+        type: "content"
+      },
+      {
+        title: "Concept 13",
+        content: [
+          "Class note point 13 for The Reign of Terror with detailed explanation and context.",
+          "Sequence the explanation so students can follow cause, action, and consequence.",
+          "Add one relatable example and one recall cue students can use during revision.",
+          "Concept 13: include precise historical/context detail that clarifies the sequence of events around The Reign of Terror.",
+          "Highlight one cause-and-effect chain linked to The Reign of Terror and explain why it changed outcomes.",
+          "Add one concrete classroom example tied to Concept 13 so students can apply the concept accurately.",
+          "Include a misconception check related to Concept 13 and provide the correction with evidence.",
+          "Connect this point to assessment language by modeling how students should justify claims about The Reign of Terror."
+        ],
+        notes: "Teacher study note: include teaching cue and transition line.",
+        type: "content"
+      },
+      {
+        title: "Concept 14",
+        content: [
+          "Class note point 14 for The Reign of Terror with detailed explanation and context.",
+          "Sequence the explanation so students can follow cause, action, and consequence.",
+          "Add one relatable example and one recall cue students can use during revision.",
+          "Concept 14: include precise historical/context detail that clarifies the sequence of events around The Reign of Terror.",
+          "Highlight one cause-and-effect chain linked to The Reign of Terror and explain why it changed outcomes.",
+          "Add one concrete classroom example tied to Concept 14 so students can apply the concept accurately.",
+          "Include a misconception check related to Concept 14 and provide the correction with evidence.",
+          "Connect this point to assessment language by modeling how students should justify claims about The Reign of Terror."
+        ],
+        notes: "Teacher study note: include teaching cue and transition line.",
+        type: "content"
+      },
+      {
+        title: "Concept 15",
+        content: [
+          "Class note point 15 for The Reign of Terror with detailed explanation and context.",
+          "Sequence the explanation so students can follow cause, action, and consequence.",
+          "Add one relatable example and one recall cue students can use during revision.",
+          "Concept 15: include precise historical/context detail that clarifies the sequence of events around The Reign of Terror.",
+          "Highlight one cause-and-effect chain linked to The Reign of Terror and explain why it changed outcomes.",
+          "Add one concrete classroom example tied to Concept 15 so students can apply the concept accurately.",
+          "Include a misconception check related to Concept 15 and provide the correction with evidence.",
+          "Connect this point to assessment language by modeling how students should justify claims about The Reign of Terror."
+        ],
+        notes: "Teacher study note: include teaching cue and transition line.",
         type: "content"
       }
     ]
   };
 
-  const loadSample = () => {
-    setContent(SAMPLE_CONTENT);
-    setFileName("Area_and_Volume_Lesson.txt");
-    setViewMode('reader');
-    stopReading();
+  const SAMPLE_PPT_HI: Presentation = {
+    title: "दो बैलों की कथा - मुंशी प्रेमचंद",
+    slides: [
+      {
+        title: "पाठ का परिचय",
+        content: [
+          "मुंशी प्रेमचंद की कहानी 'दो बैलों की कथा' का संक्षिप्त परिचय",
+          "कहानी के प्रमुख पात्र: हीरा और मोती",
+          "कहानी का सामाजिक और सांस्कृतिक संदर्भ",
+          "इस पाठ के माध्यम से मिलने वाली शिक्षा"
+        ],
+        notes: "इस स्लाइड में कहानी का संक्षिप्त परिचय दें जिससे छात्रों को कहानी की पृष्ठभूमि समझने में मदद मिले। मुख्य पात्रों का परिचय और उनका महत्त्व समझाएं।",
+        type: "title"
+      },
+      {
+        title: "कहानी की पृष्ठभूमि",
+        content: [
+          "कहानी का ग्रामीण परिवेश और उसकी विशेषताएं",
+          "भारत के ग्रामीण समाज का चित्रण",
+          "प्रेमचंद की लेखनी की विशेषताएं",
+          "कहानी का कालखंड और उसकी प्रासंगिकता",
+          "हीरा और मोती के माध्यम से दिखाया गया पशु-मानव संबंध",
+          "ग्रामीण जीवन की कठिनाइयां और संघर्ष",
+          "कहानी का नैतिक और सामाजिक संदेश",
+          "प्रेमचंद की भाषा और शैली की विशिष्टता"
+        ],
+        notes: "कहानी का ग्रामीण परिवेश छात्रों को समझाएं। प्रेमचंद की भाषा शैली की विशेषताओं पर ध्यान दें। कहानी के नैतिक संदेश को स्पष्ट करें।",
+        type: "content"
+      },
+      {
+        title: "मुख्य पात्र",
+        content: [
+          "हीरा: साहसी और वफादार बैल",
+          "मोती: समझदार और सहनशील बैल",
+          "हीरा और मोती का आपसी संबंध",
+          "पात्रों के माध्यम से लेखक का संदेश",
+          "पात्रों के चरित्र की विशेषताएं",
+          "इनका ग्रामीण जीवन में योगदान",
+          "इनके माध्यम से समाज का चित्रण",
+          "पात्रों की प्रेरणादायक भूमिका"
+        ],
+        notes: "प्रत्येक पात्र की विशेषताओं को छात्रों तक पहुंचाएं। उनके आपसी संबंध और सामाजिक योगदान पर चर्चा करें। पात्रों के माध्यम से प्राप्त होने वाले संदेश पर ध्यान दें।",
+        type: "content"
+      },
+      {
+        title: "कहानी की प्रमुख घटनाएं",
+        content: [
+          "हीरा और मोती की स्वतंत्रता की खोज",
+          "दोनों बैलों की साहसिक यात्रा",
+          "किसान से बैलों की विदाई",
+          "साहस और धैर्य की परीक्षा",
+          "बैलगाड़ी की घटना और उससे उत्पन्न संघर्ष",
+          "मोती का घायल होना और हीरा की मदद",
+          "दोनों बैलों की वापसी और समाज की प्रतिक्रिया",
+          "घटनाओं के माध्यम से दिखाए गए सामाजिक मुद्दे"
+        ],
+        notes: "प्रत्येक घटना को विस्तार से चर्चा करें। हीरा और मोती के साहसिक कार्यों को छात्रों के समक्ष प्रस्तुत करें। घटनाओं के सामाजिक मुद्दों पर ध्यान दें।",
+        type: "content"
+      },
+      {
+        title: "कहानी का विषय और संदेश",
+        content: [
+          "स्वतंत्रता की चाहत और उसका महत्त्व",
+          "साहस, धैर्य और मित्रता की भूमिका",
+          "पशु-मानव संबंधों की गहराई",
+          "सामाजिक न्याय और समानता का संदेश",
+          "प्रेमचंद की लेखनी में समाज सुधार की झलक",
+          "ग्रामीण जीवन की सच्चाई और संघर्ष",
+          "पशुओं के माध्यम से जीवन के मूल्य",
+          "कहानी के माध्यम से प्रेमचंद का सामाजिक दृष्टिकोण"
+        ],
+        notes: "कहानी के विषयों और संदेशों पर गहन चर्चा करें। प्रेमचंद के सामाजिक दृष्टिकोण को स्पष्ट करें। विद्यार्थियों को कहानी के नैतिक संदेश पर विचार करने के लिए प्रेरित करें।",
+        type: "content"
+      },
+      {
+        title: "प्रेमचंद की लेखनी की विशेषताएं",
+        content: [
+          "साधारण भाषा में गहरी बातें कहने की क्षमता",
+          "ग्रामीण जीवन का वास्तविक चित्रण",
+          "सामाजिक मुद्दों पर संवेदनशीलता",
+          "पात्रों के माध्यम से जीवन के मूल्य दर्शाना",
+          "कहानी में संदेश देने की शैली",
+          "लेखक की मानवता और संवेदना",
+          "प्रेमचंद की लेखनी का सामाजिक प्रभाव",
+          "भारतीय साहित्य में प्रेमचंद का स्थान"
+        ],
+        notes: "प्रेमचंद की लेखनी की विशेषताओं पर जोर दें। उनकी भाषा शैली और सामाजिक दृष्टिकोण को समझाएं। कहानी के माध्यम से दिए गए संदेशों पर विचार करें।",
+        type: "content"
+      },
+      {
+        title: "कहानी की सांस्कृतिक और सामाजिक प्रासंगिकता",
+        content: [
+          "भारतीय ग्रामीण समाज का चित्रण",
+          "सामाजिक सुधार की दिशा में प्रेमचंद का योगदान",
+          "कहानी में दिखाए गए सामाजिक मुद्दे",
+          "पशु-मानव संबंधों की सांस्कृतिक प्रासंगिकता",
+          "समाज में समानता और न्याय की आवश्यकता",
+          "ग्रामीण जीवन की कठिनाइयों का वर्णन",
+          "साहित्यिक दृष्टिकोण से कहानी का महत्त्व",
+          "कहानी का समय के साथ बदलता परिप्रेक्ष्य"
+        ],
+        notes: "कहानी की सामाजिक और सांस्कृतिक प्रासंगिकता पर चर्चा करें। प्रेमचंद के योगदान को छात्रों के सामने रखें। समाज में समानता और न्याय की आवश्यकता पर जोर दें।",
+        type: "content"
+      },
+      {
+        title: "कहानी की भाषा और शैली",
+        content: [
+          "सरल और स्पष्ट भाषा का प्रयोग",
+          "संवेदनशीलता और मानवीयता का समावेश",
+          "ग्रामीण बोली और संवाद की प्रमुखता",
+          "भावनाओं का सजीव चित्रण",
+          "प्राकृतिक और सामाजिक चित्रण की शैली",
+          "पात्रों की संवाद शैली",
+          "कहानी के प्रवाह में भाषा की भूमिका",
+          "भाषा के माध्यम से पाठकों से जुड़ाव"
+        ],
+        notes: "कहानी की भाषा और शैली को गहनता से समझाएं। प्रेमचंद की लेखनी में संवेदनशीलता और मानवीयता पर ध्यान दें। भाषा के माध्यम से कहानी के प्रवाह को समझाएं।",
+        type: "content"
+      },
+      {
+        title: "कहानी का साहित्यिक महत्त्व",
+        content: [
+          "मुंशी प्रेमचंद का साहित्यिक योगदान",
+          "कहानी का भारतीय साहित्य में स्थान",
+          "पात्रों के माध्यम से समाज का चित्रण",
+          "साहित्यिक दृष्टिकोण से कहानी की प्रासंगिकता",
+          "सामाजिक संदेश और नैतिक मूल्यों का संचार",
+          "कहानी की लोकप्रियता और प्रभाव",
+          "पाठकों पर कहानी का प्रभाव",
+          "कहानी का समय के साथ बदलता महत्त्व"
+        ],
+        notes: "कहानी के साहित्यिक महत्त्व पर चर्चा करें। साहित्य में प्रेमचंद के योगदान को स्पष्ट करें। कहानी की प्रासंगिकता और प्रभाव पर ध्यान दें।",
+        type: "content"
+      },
+      {
+        title: "कहानी के सामाजिक मुद्दे",
+        content: [
+          "ग्रामीण जीवन की कठिनाइयां",
+          "सामाजिक असमानता और न्याय की कमी",
+          "पशु-मानव संबंधों की गहराई",
+          "सामाजिक सुधार की आवश्यकता",
+          "कहानी में दिखाए गए संघर्ष",
+          "समाज में समानता और न्याय की आवश्यकता",
+          "सामाजिक मुद्दों का गहन चित्रण",
+          "कहानी के माध्यम से सामाजिक जागरूकता"
+        ],
+        notes: "कहानी में दिखाए गए सामाजिक मुद्दों पर गहन चर्चा करें। सामाजिक असमानता और सुधार की आवश्यकता को छात्रों के सामने रखें। कहानी के माध्यम से सामाजिक जागरूकता पर जोर दें।",
+        type: "content"
+      },
+      {
+        title: "पाठ के मुख्य संदेश",
+        content: [
+          "साहस और धैर्य का महत्त्व",
+          "मित्रता और विश्वास की भूमिका",
+          "स्वतंत्रता की चाहत और संघर्ष",
+          "पशु-मानव संबंधों की मानवीयता",
+          "सामाजिक न्याय और समानता की आवश्यकता",
+          "ग्रामीण जीवन की वास्तविकता",
+          "संवेदनशीलता और मानवीयता का संदेश",
+          "समाज में सुधार की दिशा में प्रेरणा"
+        ],
+        notes: "पाठ के मुख्य संदेश छात्रों को स्पष्ट करें। साहस, धैर्य और मित्रता के महत्त्व पर विचार करें। समाज में सुधार की दिशा में प्रेरणा दें।",
+        type: "content"
+      },
+      {
+        title: "कहानी के नैतिक और सांस्कृतिक मूल्य",
+        content: [
+          "नैतिक शिक्षा और समाज सुधार",
+          "संवेदनशीलता और इंसानियत का संदेश",
+          "सांस्कृतिक मान्यताएं और परंपराएं",
+          "समाज में समानता और न्याय की आवश्यकता",
+          "पशु-मानव संबंधों की सांस्कृतिक प्रासंगिकता",
+          "कहानी का समाज पर प्रभाव",
+          "मानवता और संवेदना का प्रसार",
+          "कहानी के माध्यम से सांस्कृतिक जागरूकता"
+        ],
+        notes: "कहानी के नैतिक और सांस्कृतिक मूल्यों पर जोर दें। समाज में समानता और न्याय की आवश्यकता को स्पष्ट करें। कहानी के माध्यम से सांस्कृतिक जागरूकता पर विचार करें।",
+        type: "content"
+      },
+      {
+        title: "कहानी का पाठ्यकम में स्थान",
+        content: [
+          "शिक्षा में नैतिक मूल्यों का समावेश",
+          "साहित्यिक दृष्टिकोण से पाठ्यक्रम की प्रासंगिकता",
+          "कहानी के माध्यम से सामाजिक शिक्षा",
+          "पाठ्यक्रम में कहानी का महत्त्व",
+          "छात्रों के लिए नैतिक और सामाजिक शिक्षा",
+          "कहानी का साहित्यिक प्रभाव",
+          "साहित्य में प्रेमचंद का स्थान",
+          "शिक्षा में कहानी का योगदान"
+        ],
+        notes: "कहानी का पाठ्यक्रम में स्थान और महत्त्व पर चर्चा करें। शिक्षा में नैतिक और सामाजिक मूल्यों के समावेश को स्पष्ट करें। साहित्य में कहानी का प्रभाव समझाएं।",
+        type: "content"
+      },
+      {
+        title: "पाठ का पुनरावलोकन",
+        content: [
+          "कहानी के मुख्य बिंदुओं का सारांश",
+          "प्रमुख पात्रों और घटनाओं की पुनरावृत्ति",
+          "कहानी के सामाजिक और सांस्कृतिक मुद्दे",
+          "प्रेमचंद की लेखनी की विशेषताएं",
+          "कहानी का नैतिक और सांस्कृतिक मूल्य",
+          "पाठ के मुख्य संदेश और शिक्षाएं",
+          "कहानी का साहित्यिक और पाठ्यक्रम में महत्त्व",
+          "समाज पर कहानी का प्रभाव"
+        ],
+        notes: "कहानी के मुख्य बिंदुओं का सारांश प्रस्तुत करें। प्रमुख पात्रों, घटनाओं और संदेशों पर ध्यान दें। कहानी के सामाजिक और सांस्कृतिक मुद्दों की पुनरावृत्ति करें।",
+        type: "content"
+      },
+      {
+        title: "पाठ की समापन टिप्पणी",
+        content: [
+          "मुंशी प्रेमचंद की कहानी में सामाजिक और नैतिक मूल्यों का समावेश",
+          "हीरा और मोती के माध्यम से साहस और मित्रता का संदेश",
+          "कहानी का साहित्यिक महत्त्व और समाज पर प्रभाव",
+          "ग्रामीण जीवन की कठिनाइयां और संघर्ष का वर्णन",
+          "पाठ्यक्रम में कहानी का स्थान और शिक्षा में योगदान",
+          "प्रेमचंद की लेखनी और कहानी का सामाजिक दृष्टिकोण"
+        ],
+        notes: "पाठ की समापन टिप्पणी में कहानी के समग्र महत्त्व और प्रभाव को स्पष्ट करें। प्रेमचंद की लेखनी और कहानी के सामाजिक दृष्टिकोण पर ध्यान दें। कहानी के नैतिक और साहित्यिक मूल्यों को छात्रों तक पहुंचाएं।",
+        type: "summary"
+      }
+    ]
   };
 
-  const loadPPTSample = () => {
-    setPresentation(SAMPLE_PPT);
-    setFileName("Reign_of_Terror_Presentation.json");
+  const loadSample = () => {
+    // No-op or removed as requested
+  };
+
+  const loadPPTSample = (lang: 'en' | 'hi' = 'en') => {
+    const sample = lang === 'en' ? SAMPLE_PPT_EN : SAMPLE_PPT_HI;
+    setPresentation(sample);
+    setFileName(lang === 'en' ? "Reign_of_Terror_Presentation.json" : "Do_Bailon_Ki_Katha.json");
     setViewMode('presentation');
     setCurrentSlideIndex(0);
+    setCurrentLang(lang);
     stopReading();
   };
 
@@ -423,7 +725,7 @@ Next Steps
       setWords([]);
       setStructuredContent([]);
     }
-  }, [content, presentation, currentSlideIndex, viewMode]);
+  }, [content, presentation, currentSlideIndex, viewMode, isNotesVisible]);
 
   // Auto-scroll to current word
   useEffect(() => {
@@ -450,10 +752,18 @@ Next Steps
     const textToRead = words.slice(startIndex).map(w => w.text).join(' ');
     const utterance = new SpeechSynthesisUtterance(textToRead);
     
+    // Set language for TTS based on content
+    const isHindi = /[\u0900-\u097F]/.test(textToRead);
+    utterance.lang = isHindi ? 'hi-IN' : 'en-US';
+    
     utterance.rate = playbackRate;
     utterance.volume = isMuted ? 0 : volume;
     
-    if (selectedVoice) {
+    // Try to find a voice matching the detected language
+    const suitableVoice = voices.find(v => v.lang.startsWith(isHindi ? 'hi' : 'en'));
+    if (suitableVoice) {
+      utterance.voice = suitableVoice;
+    } else if (selectedVoice) {
       const voice = voices.find(v => v.name === selectedVoice);
       if (voice) utterance.voice = voice;
     }
@@ -525,8 +835,12 @@ Next Steps
           presentationData = json.presentation;
         } else if (json.data?.lesson_plan?.ppt_content?.presentation) {
           presentationData = json.data.lesson_plan.ppt_content.presentation;
+        } else if (json.data?.version?.ppt_content?.presentation) {
+          presentationData = json.data.version.ppt_content.presentation;
         } else if (json.data?.lesson_plan?.content_metadata?.ppt_content?.presentation) {
           presentationData = json.data.lesson_plan.content_metadata.ppt_content.presentation;
+        } else if (json.data?.version?.content_metadata?.ppt_content?.presentation) {
+          presentationData = json.data.version.content_metadata.ppt_content.presentation;
         } else if (json.data?.versions && Array.isArray(json.data.versions)) {
           // Find the latest version by version_number
           const latest = json.data.versions.reduce((prev: any, current: any) => {
@@ -534,7 +848,9 @@ Next Steps
             const currNum = current.version_number || 0;
             return (prevNum > currNum) ? prev : current;
           }, json.data.versions[0]);
-          presentationData = latest?.ppt_content?.presentation;
+          
+          // Check if the latest version itself has the presentation data
+          presentationData = latest?.ppt_content?.presentation || latest?.content_metadata?.ppt_content?.presentation;
         }
 
         if (presentationData) {
@@ -657,26 +973,28 @@ Next Steps
                   <p className="opacity-50">Supports PDF, TXT, MD, and JSON (PPT)</p>
                 </div>
                 <div className="flex flex-col gap-3 mt-4 w-full">
-                  <button 
-                    onClick={(e) => {
-                      e.stopPropagation();
-                      loadSample();
-                    }}
-                    className="bg-orange-500 hover:bg-orange-600 text-white px-6 py-3 rounded-2xl text-sm font-bold transition-all shadow-lg shadow-orange-500/20 flex items-center justify-center gap-2"
-                  >
-                    <BookOpen size={18} />
-                    Load Grade 6 Math Sample
-                  </button>
-                  <button 
-                    onClick={(e) => {
-                      e.stopPropagation();
-                      loadPPTSample();
-                    }}
-                    className="bg-white/10 hover:bg-white/20 text-white px-6 py-3 rounded-2xl text-sm font-bold transition-all border border-white/10 flex items-center justify-center gap-2"
-                  >
-                    <PresentationIcon size={18} />
-                    Load French Revolution PPT Sample
-                  </button>
+                  <div className="grid grid-cols-2 gap-3">
+                    <button 
+                      onClick={(e) => {
+                        e.stopPropagation();
+                        loadPPTSample('en');
+                      }}
+                      className="bg-white/10 hover:bg-white/20 text-white px-4 py-3 rounded-2xl text-xs font-bold transition-all border border-white/10 flex items-center justify-center gap-2"
+                    >
+                      <PresentationIcon size={16} />
+                      French Revolution (EN)
+                    </button>
+                    <button 
+                      onClick={(e) => {
+                        e.stopPropagation();
+                        loadPPTSample('hi');
+                      }}
+                      className="bg-white/10 hover:bg-white/20 text-white px-4 py-3 rounded-2xl text-xs font-bold transition-all border border-white/10 flex items-center justify-center gap-2"
+                    >
+                      <PresentationIcon size={16} />
+                      दो बैलों की कथा (HI)
+                    </button>
+                  </div>
                   <div className="grid grid-cols-2 gap-3">
                     <button 
                       onClick={(e) => {
@@ -764,7 +1082,10 @@ Next Steps
                 <div className="flex-[3] flex flex-col p-8 md:p-12 overflow-hidden border-r border-white/5 relative">
                   {/* Toggle Notes Button (Floating) */}
                   <button 
-                    onClick={() => setIsNotesVisible(!isNotesVisible)}
+                    onClick={() => {
+                      stopReading();
+                      setIsNotesVisible(!isNotesVisible);
+                    }}
                     className={cn(
                       "absolute top-8 right-8 p-3 rounded-xl transition-all z-10 flex items-center gap-2 text-xs font-bold uppercase tracking-widest",
                       isNotesVisible 
